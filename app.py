@@ -3,8 +3,17 @@ from transformers import AutoTokenizer, TFAutoModelForSeq2SeqLM
 
 app = Flask(__name__)
 
-tokenizer = AutoTokenizer.from_pretrained("Alex034/t5-small-indosum-summary-freeze")
-model = TFAutoModelForSeq2SeqLM.from_pretrained("Alex034/t5-small-indosum-summary-freeze")
+# Load the tokenizer and model during the initialization
+tokenizer = None
+model = None
+
+def load_model_and_tokenizer():
+    global tokenizer, model
+    tokenizer = AutoTokenizer.from_pretrained("Alex034/t5-small-indosum-summary-freeze")
+    model = TFAutoModelForSeq2SeqLM.from_pretrained("Alex034/t5-small-indosum-summary-freeze")
+
+# Call the load_model_and_tokenizer function to load the resources
+load_model_and_tokenizer()
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
