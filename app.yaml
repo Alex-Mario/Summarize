@@ -1,11 +1,8 @@
 runtime: python39
+
 instance_class: F4_1G
-automatic_scaling:
-  request_timeout: 300s
-  target_cpu_utilization: 0.65
-  min_instances: 1
-  max_instances: 15
-  target_throughput_utilization: 0.6
+
 entrypoint: gunicorn -b :$PORT app:app
+
 env_variables:
-  PORT: 8080
+  TF_FORCE_GPU_ALLOW_GROWTH: "true"
