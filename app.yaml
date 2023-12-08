@@ -1,14 +1,10 @@
-runtime: python39  # because you're using Python
-env: flex  # use the flexible environment
-
-entrypoint: streamlit run --server.port $PORT --server.enableCORS false app.py
-
+runtime: python39
+instance_class: F2
 automatic_scaling:
   target_cpu_utilization: 0.65
   min_instances: 1
-  max_instances: 5
-
-resources:
-  cpu: 64
-  memory_gb: 16
-  disk_size_gb: 15
+  max_instances: 15
+  target_throughput_utilization: 0.6
+entrypoint: gunicorn -b :$PORT app:app
+env_variables:
+  PORT: 8080

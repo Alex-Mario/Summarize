@@ -1,25 +1,20 @@
-import streamlit as st
+from flask import Flask, request, render_template
 from transformers import AutoTokenizer, TFAutoModelForSeq2SeqLM
 
-@st.cache(allow_output_mutation=True)
-def load_model():
-    tokenizer = AutoTokenizer.from_pretrained("Alex034/t5-small-indosum-summary-freeze")
-    model = TFAutoModelForSeq2SeqLM.from_pretrained("Alex034/t5-small-indosum-summary-freeze")
-    return tokenizer, model
+app = Flask(__name__)
 
-def generate_summary(document, tokenizer, model):
-    inputs = tokenizer(document, return_tensors="tf")
-    outputs = model.generate(inputs.input_ids, max_length=256)
-    decoded_output = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return decoded_output
+tokenizer = AutoTokenizer.from_pretrained("Alex034/t5-small-indosum-summary-freeze")
+model = TFAutoModelForSeq2SeqLM.from_pretrained("Alex034/t5-small-indosum-summary-freeze")
 
-def main():
-    st.title('Text Summarization')
-    document = st.text_area("Input document here:", value='', height=None, max_chars=None, key=None)
-    if st.button('Generate Summary'):
-        with st.spinner('Generating...'):
-            summary = generate_summary(document, *load_model())
-            st.write(summary)
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    if request.method == 'POST':
+        document = request.form['document']
+        inputs = tokenizer(document, return_tensors="tf")
+        outputs = model.generate(inputs.input_ids, max_length=256)
+        summary = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        return render_template('index.html', summary=summary)
+    return render_template('index.html')
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run(debug=True)
